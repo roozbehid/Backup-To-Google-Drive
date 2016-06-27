@@ -1,5 +1,5 @@
 from apiclient.discovery import build
-from oauth2client.client import SignedJwtAssertionCredentials
+from oauth2client.service_account import ServiceAccountCredentials
 from apiclient.http import MediaFileUpload
 from apiclient import errors
 from datetime import datetime
@@ -12,12 +12,13 @@ def createDriveService(config):
     Drive service object.
   """
 
-  f = file(config['private_key12_path'], 'rb')
-  key = f.read()
-  f.close()
+
   # config.service_account Email of the Service Account.
-  credentials = SignedJwtAssertionCredentials(config['service_account'], key,
-      scope='https://www.googleapis.com/auth/drive')
+  scopes = ['https://www.googleapis.com/auth/drive']
+  credentials = ServiceAccountCredentials.from_p12_keyfile(
+    config['service_account'], config['private_key12_path'], config['private_key_password'], scopes)
+  #credentials = SignedJwtAssertionCredentials(config['service_account'], config['private_key12_path'],
+  #    scope='https://www.googleapis.com/auth/drive')
   http = httplib2.Http()
   http = credentials.authorize(http)
 
